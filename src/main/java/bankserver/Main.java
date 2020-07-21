@@ -8,6 +8,7 @@ public class Main {
         try {
             Server server = new Server(Integer.parseInt(port), debug.equals("1"));
             server.start();
+            System.out.println("Server started");
         } catch (Exception e) {
             e.printStackTrace();
         }

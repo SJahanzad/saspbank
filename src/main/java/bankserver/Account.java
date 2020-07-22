@@ -1,12 +1,30 @@
 package bankserver;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Scanner;
 
 public class Account {
-    private static Map<String, Account> allAccounts = new HashMap<>();
-    private static Map<Integer, Account> allAccountsById = new HashMap<>();
+    private static AccountRecord accountRecord;
+
+    static {
+        try {
+            File records = new File("data/.records");
+            if (records.createNewFile()) {
+                accountRecord = new AccountRecord();
+            } else {
+                accountRecord = new Gson().fromJson(FileManager.readWholeFile(records), AccountRecord.class);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private String firstName;
     private String lastName;
     private String username;
@@ -22,20 +40,20 @@ public class Account {
         this.lastName = lastName;
         this.username = username;
         this.password = password;
-        allAccounts.put(username, this);
-        id = allAccountsById.size() + 1;
-        allAccountsById.put(id, this);
+        FileManager.writeObjectToFileInAddress(accountRecord, "data/.records");
+        id = accountRecord.getCount() + 1;
         receiptsWithThisAsTheSource = new ArrayList<>();
         receiptsWithThisAsTheDest = new ArrayList<>();
         balance = 0;
+        FileManager.updateAccount(this);
     }
 
     public static boolean accountExists(String username) {
-        return allAccounts.containsKey(username);
+        return FileManager.fileExists(username);
     }
 
     public static Account getAccount(String username, String password) throws InvalidPasswordException {
-        Account result = allAccounts.get(username);
+        Account result = FileManager.getAccount(username);
         if (result.passwordMatches(password)) {
             return result;
         }
@@ -43,7 +61,7 @@ public class Account {
     }
 
     public static Account getAccount(int id) {
-        return allAccountsById.getOrDefault(id, null);
+        return accountRecord.getAccountById(id);
     }
 
     public static Account getAccount(String idString) {
@@ -105,5 +123,15 @@ public class Account {
             receiptsWithThisAsTheSource.add(receipt);
         if (receipt.getDestAccountID() == id)
             receiptsWithThisAsTheDest.add(receipt);
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public String toString() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 }

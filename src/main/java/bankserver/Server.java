@@ -42,10 +42,14 @@ public class Server {
             if (!password.equals(repeatPassword)) {
                 return "passwords do not match";
             }
-            if (Account.accountExists(username)) {
-                return "username is not available";
+            try {
+                if (Account.accountExists(username)) {
+                    return "username is not available";
+                }
+                return String.valueOf(new Account(firstName, lastName, username, password).getId());
+            } catch (DataBaseException e) {
+                return e.getMessage();
             }
-            return String.valueOf(new Account(firstName, lastName, username, password).getId());
         } else {
             return "invalid input";
         }
@@ -56,11 +60,13 @@ public class Server {
         if (matcher.find()) {
             String username = matcher.group(1);
             String password = matcher.group(2);
-            if (Account.accountExists(username)) {
-                return "invalid username or password";
-            }
             try {
+                if (Account.accountExists(username)) {
+                    return "invalid username or password";
+                }
                 return Account.getAccount(username, password).getToken();
+            } catch (DataBaseException e) {
+                return e.getMessage();
             } catch (Exception e) {
                 return "invalid username or password";
             }

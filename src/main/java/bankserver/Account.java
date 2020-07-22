@@ -13,7 +13,7 @@ public class Account {
             File dataDirectory = new File("data");
             if (!dataDirectory.exists())
                 dataDirectory.mkdir();
-            File records = new File("data/.records");
+            File records = new File("data/.records.json");
             if (records.createNewFile()) {
                 accountRecord = new AccountRecord();
             } else {
@@ -34,7 +34,7 @@ public class Account {
     private ArrayList<Receipt> receiptsWithThisAsTheSource;
     private ArrayList<Receipt> receiptsWithThisAsTheDest;
 
-    public Account(String firstName, String lastName, String username, String password) {
+    public Account(String firstName, String lastName, String username, String password) throws DataBaseException {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -48,11 +48,12 @@ public class Account {
         FileManager.updateAccount(this);
     }
 
-    public static boolean accountExists(String username) {
+    public static boolean accountExists(String username) throws DataBaseException {
         return FileManager.fileExists(username);
     }
 
-    public static Account getAccount(String username, String password) throws InvalidPasswordException {
+    public static Account getAccount(String username, String password)
+            throws InvalidPasswordException, DataBaseException {
         Account result = FileManager.getAccount(username);
         if (result.passwordMatches(password)) {
             return result;
@@ -116,14 +117,14 @@ public class Account {
         return balance;
     }
 
-    public void alterBalance(long amount) throws InsufficientBalanceException {
+    public void alterBalance(long amount) throws InsufficientBalanceException, DataBaseException {
         if (balance + amount < 0)
             throw new InsufficientBalanceException();
         balance += amount;
         FileManager.updateAccount(this);
     }
 
-    public void acceptReceipt(Receipt receipt) {
+    public void acceptReceipt(Receipt receipt) throws DataBaseException {
         if (receipt.getSourceAccountID() == id)
             receiptsWithThisAsTheSource.add(receipt);
         if (receipt.getDestAccountID() == id)

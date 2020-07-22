@@ -15,35 +15,33 @@ public class FileManager {
         this.directory = directory;
     }
 
-    public static void updateAccount(Account account) {
+    public static void updateAccount(Account account) throws DataBaseException {
         String address = "data/" + account.getUsername();
         writeObjectToFileInAddress(account, address);
         writeObjectToFileInAddress(Account.getAccountRecord(), "data/.records");
     }
 
-    public static boolean fileExists(String username) {
+    public static boolean fileExists(String username) throws DataBaseException {
         String address = "data/" + username;
         try {
             File file = new File(address);
             return file.exists();
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new DataBaseException();
         }
     }
 
-    public static Account getAccount(String username) {
+    public static Account getAccount(String username) throws DataBaseException {
         try {
             File file = new File("data/" + username);
             Gson gson = new Gson();
             return gson.fromJson(readWholeFile(file), Account.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new DataBaseException();
         }
-        return null;
     }
 
-    public static String readWholeFile(File file) {
+    public static String readWholeFile(File file) throws DataBaseException {
         StringBuilder result = new StringBuilder();
         try {
             Scanner scanner = new Scanner(file);
@@ -53,17 +51,16 @@ public class FileManager {
             scanner.close();
             return result.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new DataBaseException();
         }
-        return "";
     }
 
-    public static<T> void writeObjectToFileInAddress(T object, String address) {
+    public static<T> void writeObjectToFileInAddress(T object, String address) throws DataBaseException {
         try (PrintWriter writer = new PrintWriter(address + ".json")) {
             Gson gson = new Gson();
             writer.println(gson.toJson(object));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new DataBaseException();
         }
     }
 }

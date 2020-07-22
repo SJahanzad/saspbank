@@ -18,6 +18,7 @@ public class FileManager {
     public static void updateAccount(Account account) {
         String address = "data/" + account.getUsername();
         writeObjectToFileInAddress(account, address);
+        writeObjectToFileInAddress(Account.getAccountRecord(), "data/.records");
     }
 
     public static boolean fileExists(String username) {
@@ -58,7 +59,7 @@ public class FileManager {
     }
 
     public static<T> void writeObjectToFileInAddress(T object, String address) {
-        try (PrintWriter writer = new PrintWriter(address)) {
+        try (PrintWriter writer = new PrintWriter(address + ".json")) {
             Gson gson = new Gson();
             writer.println(gson.toJson(object));
         } catch (Exception e) {

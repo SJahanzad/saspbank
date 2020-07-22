@@ -1,19 +1,18 @@
 package bankserver;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Account {
     private static AccountRecord accountRecord;
 
     static {
         try {
+            File dataDirectory = new File("data");
+            if (!dataDirectory.exists())
+                dataDirectory.mkdir();
             File records = new File("data/.records");
             if (records.createNewFile()) {
                 accountRecord = new AccountRecord();
@@ -40,6 +39,7 @@ public class Account {
         this.lastName = lastName;
         this.username = username;
         this.password = password;
+        accountRecord.addAccount(this);
         FileManager.writeObjectToFileInAddress(accountRecord, "data/.records");
         id = accountRecord.getCount() + 1;
         receiptsWithThisAsTheSource = new ArrayList<>();
@@ -72,6 +72,10 @@ public class Account {
             return null;
         }
         return getAccount(id);
+    }
+
+    public static AccountRecord getAccountRecord() {
+        return accountRecord;
     }
 
     public boolean passwordMatches(String password) {
@@ -116,6 +120,7 @@ public class Account {
         if (balance + amount < 0)
             throw new InsufficientBalanceException();
         balance += amount;
+        FileManager.updateAccount(this);
     }
 
     public void acceptReceipt(Receipt receipt) {
@@ -123,6 +128,7 @@ public class Account {
             receiptsWithThisAsTheSource.add(receipt);
         if (receipt.getDestAccountID() == id)
             receiptsWithThisAsTheDest.add(receipt);
+        FileManager.updateAccount(this);
     }
 
     public String getUsername() {

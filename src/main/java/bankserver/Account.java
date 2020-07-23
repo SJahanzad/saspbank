@@ -40,7 +40,7 @@ public class Account {
         this.username = username;
         this.password = password;
         accountRecord.addAccount(this);
-        FileManager.writeObjectToFileInAddress(accountRecord, "data/.records");
+        FileManager.writeObjectToJsonFileWithName(accountRecord, ".records");
         id = accountRecord.getCount() + 1;
         receiptsWithThisAsTheSource = new ArrayList<>();
         receiptsWithThisAsTheDest = new ArrayList<>();

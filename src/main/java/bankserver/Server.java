@@ -32,7 +32,7 @@ public class Server {
     }
 
     private String createAccount(String query) {
-        Matcher matcher = getMatcher("create_account (\\w+) (\\w+) (\\w+) (\\w+) (\\w+)", query);
+        Matcher matcher = getMatcher("create_account (\\w+) (\\w+) (\\w+) (.+) (.+)", query);
         if (matcher.find()) {
             String firstName = matcher.group(1);
             String lastName = matcher.group(2);
@@ -52,7 +52,7 @@ public class Server {
     }
 
     private String getToken(String query) {
-        Matcher matcher = getMatcher("get_token (\\w+) (\\w+)", query);
+        Matcher matcher = getMatcher("get_token (\\w+) (.+)", query);
         if (matcher.find()) {
             String username = matcher.group(1);
             String password = matcher.group(2);
@@ -272,7 +272,7 @@ public class Server {
                         removeClient(client, debug);
                     writeToOutputStream(result);
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
             }
         }

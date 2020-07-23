@@ -16,13 +16,12 @@ public class FileManager {
     }
 
     public static void updateAccount(Account account) throws DataBaseException {
-        String address = "data/" + account.getUsername();
-        writeObjectToFileInAddress(account, address);
-        writeObjectToFileInAddress(Account.getAccountRecord(), "data/.records");
+        writeObjectToJsonFileWithName(account, account.getUsername());
+        writeObjectToJsonFileWithName(Account.getAccountRecord(), ".records");
     }
 
     public static boolean fileExists(String username) throws DataBaseException {
-        String address = "data/" + username;
+        String address = getJsonFileAddress(username);
         try {
             File file = new File(address);
             return file.exists();
@@ -33,7 +32,7 @@ public class FileManager {
 
     public static Account getAccount(String username) throws DataBaseException {
         try {
-            File file = new File("data/" + username);
+            File file = new File(getJsonFileAddress(username));
             Gson gson = new Gson();
             return gson.fromJson(readWholeFile(file), Account.class);
         } catch (Exception e) {
@@ -55,12 +54,16 @@ public class FileManager {
         }
     }
 
-    public static<T> void writeObjectToFileInAddress(T object, String address) throws DataBaseException {
-        try (PrintWriter writer = new PrintWriter(address + ".json")) {
+    public static<T> void writeObjectToJsonFileWithName(T object, String fileName) throws DataBaseException {
+        try (PrintWriter writer = new PrintWriter(getJsonFileAddress(fileName))) {
             Gson gson = new Gson();
             writer.println(gson.toJson(object));
         } catch (Exception e) {
             throw new DataBaseException();
         }
+    }
+
+    public static String getJsonFileAddress(String fileName) {
+        return "data/" + fileName + ".json";
     }
 }

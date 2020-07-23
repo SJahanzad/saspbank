@@ -26,7 +26,7 @@ public class Receipt {
         paid = false;
     }
 
-    public void execute() throws InsufficientBalanceException, InvalidAccountIdException {
+    public void execute() throws InsufficientBalanceException, InvalidAccountIdException, DataBaseException {
         Account source = Account.getAccount(sourceAccountID);
         Account dest = Account.getAccount(destAccountID);
         long amountFromSource = 0;

@@ -21,6 +21,7 @@ public class AccountRecord {
     }
 
     public void addAccount(Account account) {
+        count++;
         allAccountsById.put(account.getId(), account);
     }
 }

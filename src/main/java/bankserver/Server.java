@@ -248,8 +248,8 @@ public class Server {
         }
 
         private void handleClient() {
-            if (debug)
-                writeToOutputStream("hello " + client.getId());
+//            if (debug)
+//                writeToOutputStream("hello " + client.getId());
             String query, result;
             boolean exit = false;
             while (!exit) {

@@ -95,6 +95,8 @@ public class Server {
                 dest = Account.getAccount(destId);
                 if (source == dest)
                     return "equal source and dest account";
+                if (description.contains("*") || description.contains("{") || description.contains("}"))
+                    return "your input contains invalid characters";
 //                if (!description.matches("[\\w\\s\\-.?!]"))
 //                    return "your input contains invalid characters";
                 if (receiptType == ReceiptType.DEPOSIT) {
@@ -147,7 +149,8 @@ public class Server {
             String token = matcher.group(1);
             String type = matcher.group(2);
             try {
-                Account account = Token.getAccount(token);
+                Account tempAccount = Token.getAccount(token);
+                Account account = FileManager.getAccount(tempAccount.getUsername());
                 return account.getTransactions(type);
             } catch (Exception e) {
                 return e.getMessage();
@@ -182,7 +185,8 @@ public class Server {
         if (matcher.find()) {
             String token = matcher.group(1);
             try {
-                Account account = Token.getAccount(token);
+                Account tempAccount = Token.getAccount(token);
+                Account account = FileManager.getAccount(tempAccount.getUsername());
                 return String.valueOf(account.getBalance());
             } catch (Exception e) {
                 return e.getMessage();

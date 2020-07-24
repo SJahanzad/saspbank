@@ -61,9 +61,7 @@ public class Server {
             String username = matcher.group(1);
             String password = matcher.group(2);
             try {
-                if (Account.accountExists(username)) {
-                    return "invalid username or password";
-                }
+                if (!Account.accountExists(username)) return "invalid username or password";
                 return Account.getAccount(username, password).getToken();
             } catch (DataBaseException e) {
                 return e.getMessage();
@@ -97,8 +95,8 @@ public class Server {
                 dest = Account.getAccount(destId);
                 if (source == dest)
                     return "equal source and dest account";
-                if (!description.matches("[\\w\\s\\-.?!]"))
-                    return "your input contains invalid characters";
+//                if (!description.matches("[\\w\\s\\-.?!]"))
+//                    return "your input contains invalid characters";
                 if (receiptType == ReceiptType.DEPOSIT) {
                     if (!sourceId.equals("-1"))
                         return "source account id is invalid";
@@ -106,7 +104,7 @@ public class Server {
                         return "invalid account id";
                     if (dest == null)
                         return "dest account id is invalid";
-                    if (dest != currentAccount)
+                    if (!dest.getUsername().equals(currentAccount.getUsername()))
                         return "token is invalid";
                 }
                 if (receiptType == ReceiptType.WITHDRAW) {
@@ -129,10 +127,9 @@ public class Server {
                     if (source != currentAccount)
                         return "token is invalid";
                 }
-                Receipt receipt = new Receipt(receiptType, money,
-                        Integer.parseInt(sourceId), Integer.parseInt(destId), description);
-                Objects.requireNonNull(Account.getAccount(sourceId)).acceptReceipt(receipt);
-                Objects.requireNonNull(Account.getAccount(destId)).acceptReceipt(receipt);
+                Receipt receipt = new Receipt(receiptType, money, sourceId, destId, description);
+                if (!sourceId.equals("-1")) Account.getAccount(sourceId).acceptReceipt(receipt);
+                if (!destId.equals("-1")) Account.getAccount(destId).acceptReceipt(receipt);
                 return String.valueOf(receipt.getId());
             } catch (NumberFormatException e) {
                 return "invalid money";
@@ -145,7 +142,7 @@ public class Server {
     }
 
     private String getTransactions(String query) {
-        Matcher matcher = getMatcher("get_transactions (\\w+) (\\w+)", query);
+        Matcher matcher = getMatcher("get_transactions (\\w+) (.+)", query);
         if (matcher.find()) {
             String token = matcher.group(1);
             String type = matcher.group(2);
@@ -165,7 +162,7 @@ public class Server {
         if (matcher.find()) {
             String receiptID = matcher.group(1);
             try {
-                Receipt receipt = Objects.requireNonNull(Receipt.getReceipt(Integer.parseInt(receiptID)));
+                Receipt receipt = Objects.requireNonNull(Receipt.getReceipt(receiptID));
                 if (receipt.isPaid())
                     return "receipt is paid before";
                 receipt.execute();
@@ -284,6 +281,10 @@ public class Server {
         }
 
         private void writeToOutputStream(String message) {
+            if (message == null) {
+                System.out.println("Want to print null message!!");
+                return;
+            }
             try {
                 outputStream.writeUTF(message);
                 outputStream.flush();

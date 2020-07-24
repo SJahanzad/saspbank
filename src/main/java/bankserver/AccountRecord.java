@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class AccountRecord {
     private int count;
-    private Map<Integer, Account> allAccountsById;
+    private Map<String, Account> allAccountsById;
 
     public AccountRecord() {
         count = 0;
@@ -16,7 +16,7 @@ public class AccountRecord {
         return count;
     }
 
-    public Account getAccountById(int id) {
+    public Account getAccountById(String id) {
         return allAccountsById.getOrDefault(id, null);
     }
 

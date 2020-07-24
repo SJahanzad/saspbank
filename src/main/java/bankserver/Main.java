@@ -5,8 +5,8 @@ public class Main {
         String port, debug;
 //        port = args[0];
 //        debug = args[1];
-        port = "1234";
-        debug = "1";
+        port = "2222";
+        debug = "0";
         try {
             Server server = new Server(Integer.parseInt(port), debug.equals("1"));
             server.start();

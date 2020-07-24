@@ -6,24 +6,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Receipt {
-    private static Map<Integer, Receipt> allReceipts = new HashMap<>();
+    private static Map<String, Receipt> allReceipts = new HashMap<>();
     private ReceiptType receiptType;
     private long money;
-    private int sourceAccountID;
-    private int destAccountID;
+    private String sourceAccountID;
+    private String destAccountID;
     private String description;
-    private int id;
+    private String id;
     private boolean paid;
 
-    public Receipt(ReceiptType type, long money, int sourceId, int destId, String description) {
+    public Receipt(ReceiptType type, long money, String sourceId, String destId, String description) {
         this.receiptType = type;
         this.money = money;
         this.sourceAccountID = sourceId;
         this.destAccountID = destId;
         this.description = description;
-        id = allReceipts.size() + 1;
-        allReceipts.put(id, this);
+        id = DataManager.getNewId();
         paid = false;
+        allReceipts.put(id, this);
     }
 
     public void execute() throws InsufficientBalanceException, InvalidAccountIdException, DataBaseException {
@@ -41,24 +41,24 @@ public class Receipt {
                 throw new InvalidAccountIdException();
             amountToDest = money;
         }
-        source.alterBalance(amountFromSource);
-        dest.alterBalance(amountToDest);
+        if (source != null) source.alterBalance(amountFromSource);
+        if (dest != null) dest.alterBalance(amountToDest);
         paid = true;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public int getSourceAccountID() {
+    public String getSourceAccountID() {
         return sourceAccountID;
     }
 
-    public int getDestAccountID() {
+    public String getDestAccountID() {
         return destAccountID;
     }
 
-    public static Receipt getReceipt(int receiptId) {
+    public static Receipt getReceipt(String receiptId) {
         return allReceipts.getOrDefault(receiptId, null);
     }
 

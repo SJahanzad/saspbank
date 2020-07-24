@@ -29,7 +29,7 @@ public class Account {
     private String username;
     private String password;
     private Token token;
-    private int id;
+    private String id;
     private long balance;
     private ArrayList<Receipt> receiptsWithThisAsTheSource;
     private ArrayList<Receipt> receiptsWithThisAsTheDest;
@@ -39,12 +39,12 @@ public class Account {
         this.lastName = lastName;
         this.username = username;
         this.password = password;
+        balance = 0;
+        id = DataManager.getNewId();
         accountRecord.addAccount(this);
         FileManager.writeObjectToJsonFileWithName(accountRecord, ".records");
-        id = accountRecord.getCount() + 1;
         receiptsWithThisAsTheSource = new ArrayList<>();
         receiptsWithThisAsTheDest = new ArrayList<>();
-        balance = 0;
         FileManager.updateAccount(this);
     }
 
@@ -61,18 +61,8 @@ public class Account {
         throw new InvalidPasswordException();
     }
 
-    public static Account getAccount(int id) {
+    public static Account getAccount(String id) {
         return accountRecord.getAccountById(id);
-    }
-
-    public static Account getAccount(String idString) {
-        int id = -1;
-        try {
-            id = Integer.parseInt(idString);
-        } catch (Exception e) {
-            return null;
-        }
-        return getAccount(id);
     }
 
     public static AccountRecord getAccountRecord() {
@@ -83,7 +73,7 @@ public class Account {
         return this.password.equals(password);
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -125,9 +115,9 @@ public class Account {
     }
 
     public void acceptReceipt(Receipt receipt) throws DataBaseException {
-        if (receipt.getSourceAccountID() == id)
+        if (receipt.getSourceAccountID().equals(id))
             receiptsWithThisAsTheSource.add(receipt);
-        if (receipt.getDestAccountID() == id)
+        if (receipt.getDestAccountID().equals(id))
             receiptsWithThisAsTheDest.add(receipt);
         FileManager.updateAccount(this);
     }

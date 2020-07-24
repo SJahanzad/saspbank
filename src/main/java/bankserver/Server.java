@@ -86,14 +86,13 @@ public class Server {
             ReceiptType receiptType;
             long money;
             Account currentAccount, source, dest;
-
             try {
                 receiptType = ReceiptType.getTypeFromString(receiptTypeString);
                 money = Long.parseLong(moneyString);
                 currentAccount = Token.getAccount(token);
                 source = Account.getAccount(sourceId);
                 dest = Account.getAccount(destId);
-                if (source == dest)
+                if (source != null && dest != null && source.getUsername().equals(dest.getUsername()))
                     return "equal source and dest account";
                 if (description.contains("*") || description.contains("{") || description.contains("}"))
                     return "your input contains invalid characters";
@@ -116,7 +115,7 @@ public class Server {
                         return "invalid account id";
                     if (source == null)
                         return "source account id is invalid";
-                    if (dest != currentAccount)
+                    if (!source.getUsername().equals(currentAccount.getUsername()))
                         return "token is invalid";
                 }
                 if (receiptType == ReceiptType.MOVE) {
@@ -126,9 +125,10 @@ public class Server {
                         return "source account id is invalid";
                     if (dest == null)
                         return "dest account id is invalid";
-                    if (source != currentAccount)
+                    if (!source.getUsername().equals(currentAccount.getUsername()))
                         return "token is invalid";
                 }
+                if (money <= 0) return "invalid money";
                 Receipt receipt = new Receipt(receiptType, money, sourceId, destId, description);
                 if (!sourceId.equals("-1")) Account.getAccount(sourceId).acceptReceipt(receipt);
                 if (!destId.equals("-1")) Account.getAccount(destId).acceptReceipt(receipt);

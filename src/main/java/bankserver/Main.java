@@ -6,13 +6,13 @@ public class Main {
 //        port = args[0];
 //        debug = args[1];
         port = "2222";
-        debug = "0";
+        debug = "1";
         try {
             Server server = new Server(Integer.parseInt(port), debug.equals("1"));
             server.start();
             System.out.println("Server started");
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 }
